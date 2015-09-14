@@ -124,7 +124,7 @@ vec3 Transform::upvector(const vec3 &up, const vec3 & zvec)
 }
 
 vec3 Transform::cross(const vec3 &vec1, const vec3 &vec2){
-	vec3 ret = (vec1.y * vec2.z - vec1.z * vec2.y,
+	vec3 ret = vec3(vec1.y * vec2.z - vec1.z * vec2.y,
 		vec1.z  * vec2.x - vec1.x * vec2.z,
 		vec1.x * vec2.y - vec1.y * vec2.x);
 	return ret;
