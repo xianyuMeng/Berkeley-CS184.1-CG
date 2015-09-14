@@ -5,7 +5,7 @@
 
 class Ray{
 public:
-	Ray(const glm::vec3 &direction, const glm::vec3 &position, float t_min, float &t_max) :
+	Ray(const glm::vec3 &direction, const glm::vec3 &position, float t_min, float t_max) :
 		direction(direction), pos(position), t_min(t_min), t_max(t_max){};
 	~ Ray() {};
 	const glm::vec3 direction;
