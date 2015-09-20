@@ -9,7 +9,7 @@
 class sphere : public primative{
 public:
 	//A sphere is defined by its center and radius
-	sphere::sphere(const vec3 &center, const float radius, const mat4 &transformobj, const object &obj);
+	sphere(const vec3 &center, const float radius, const mat4 &transformobj, const object &obj);
 
 	virtual ~sphere(){};
 	/*Ray - Scene Intersection

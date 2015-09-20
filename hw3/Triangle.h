@@ -3,7 +3,7 @@
 #include "Primative.h"
 class triangle : public primative{
 public:
-	triangle::triangle(const vec3 &A, const vec3 &B, const vec3 &C);
+	triangle(const vec3 &A, const vec3 &B, const vec3 &C);
 	virtual ~triangle(){};
 
 	virtual intersectP intersection(const Ray &ray) const;
