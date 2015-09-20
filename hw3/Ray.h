@@ -1,4 +1,4 @@
-#include "glm\glm.hpp"
+#include "glm/glm.hpp"
 
 #ifndef _INCLUDERAYHEADER
 #define _INCLUDERAYHEADER
