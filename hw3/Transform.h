@@ -6,11 +6,12 @@
 // Include the helper glm library, including matrix transform extensions
 
 #include "glm/glm.hpp"
-#include <glm/gtc/matrix_transform.hpp>
+
+#include "glm/gtc/matrix_transform.hpp"
 
 // glm provides vector, matrix classes like glsl
 // Typedefs to make code more readable 
-
+//using namespace glm;
 typedef glm::mat3 mat3;
 typedef glm::mat4 mat4;
 typedef glm::vec3 vec3;
@@ -32,5 +33,6 @@ public:
 	static mat4 translate(const float &tx, const float &ty, const float &tz);
 	static vec3 upvector(const vec3 &up, const vec3 &zvec);
 	static vec3 cross(const vec3 &vec1, const vec3 &vec2);
+	static float dot(const vec3 &vec1, const vec3 &vec2);
 };
 

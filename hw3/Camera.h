@@ -3,10 +3,13 @@ Create a ray starting from the camera that passes through the
 corresponding pixel on the image plane.
 Camera parameters as in gluLookAt
 *********/
-#include "glm\glm.hpp"
+#include "glm/glm.hpp"
 #include "Ray.h"
-const float pi = 3.14159265;
-using namespace glm;
+//const float pi = 3.14159265;
+typedef glm::mat3 mat3;
+typedef glm::mat4 mat4;
+typedef glm::vec3 vec3;
+typedef glm::vec4 vec4;
 #ifndef _INCLUDECAMERAHEADER
 #define _INCLUDECAMERAHEADER
 
