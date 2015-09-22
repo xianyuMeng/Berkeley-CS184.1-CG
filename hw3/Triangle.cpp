@@ -6,9 +6,12 @@ triangle::triangle(const vec3 &A, const vec3 &B, const vec3 &C, const object &ob
 
 
 intersectP triangle::intersection(const Ray &ray) const {
-	/*http://stackoverflow.com/questions/13655457/raytracing-ray-triangle-intersection 
-		see the link above to check if point is inside the triangle 
-		it may have bugs in this piece of code*/
+	/***************************************************************
+	 * http://stackoverflow.com/questions/13655457/raytracing-ray-triangle-intersection 
+	 * see the link above to check if point is inside the triangle 
+	 * it may have bugs in this piece of code
+	 *
+	 ****************************************************************/
 
 	float t = (Transform::dot(A, normal) - Transform::dot(ray.pos, normal)) / (Transform::dot(ray.direction, normal));
 	intersectP ret;
@@ -34,4 +37,5 @@ intersectP triangle::intersection(const Ray &ray) const {
 	ret.obj = obj;
 	ret.normal = vec4(normal, 0);
 	ret.intersectPoint = vec4(ray.pos + ray.direction * ret.tHit, 0);
+	return ret;
 }
