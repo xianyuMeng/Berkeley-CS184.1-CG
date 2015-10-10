@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 class Film{
+public:
 	Film(int width, int height);
 	~Film();
 	//write color on the image

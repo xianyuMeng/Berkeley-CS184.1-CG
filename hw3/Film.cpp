@@ -2,6 +2,7 @@
 
 Film::Film(int width, int height) :width(width), height(height){
 	colorbuffer = new unsigned char[width * height * 3];
+	memset((void *)colorbuffer, 0, width * height * 3);
 	//3 channels.
 }
 
@@ -10,13 +11,13 @@ Film::~Film(){
 }
 
 void Film::commit(const vec3 &color, int i, int j){
-	int step = i * width * 3 + j * 3;
-	int r = unsigned char(color.x * 255.0f);
-	int g = unsigned char(color.y * 255.0f);
-	int b = unsigned char(color.z * 255.0f);
-	colorbuffer[step] = r;
+	int step = j * width * 3 + i * 3;
+	auto r = unsigned char(color.x * 255.0f);
+	auto g = unsigned char(color.y * 255.0f);
+	auto b = unsigned char(color.z * 255.0f);
+	colorbuffer[step] = b;
 	colorbuffer[step + 1] = g;
-	colorbuffer[step + 2] = b;
+	colorbuffer[step + 2] = r;
 }
 
 void Film::WriteImage(std::string fname){

@@ -12,7 +12,7 @@ mat3 Transform::rotate(const float degrees, const vec3& axis)
 	mat3 ret;
 	// YOUR CODE FOR HW2 HERE
 	// Please implement this.  Likely the same as in HW 1.
-	const double theta = degrees*pi / 180.0;
+	const float theta = degrees*float(pi / 180.0f);
 	glm::mat3 I(cos(theta));
 	glm::mat3 Astar = glm::transpose(mat3(0.0, -axis.z, axis.y,
 		axis.z, 0.0, -axis.x,
@@ -74,7 +74,7 @@ mat4 Transform::perspective(float fovy, float aspect, float zNear, float zFar)
 {
 	// YOUR CODE FOR HW2 HERE
 	// New, to implement the perspective transform as well
-	const float theta = fovy / 2 * pi / 180.0;
+	const float theta = fovy / 2 * float(pi / 180.0f);
 	const float d = cos(theta) / sin(theta);
 	glm::mat4 ret(0.0);
 	ret[0][0] = d / aspect;
@@ -135,6 +135,10 @@ float Transform::dot(const vec3 &vec1, const vec3 &vec2){
 	return ret;
 }
 
+float Transform::distance(const vec3 &vec1, const vec3 &vec2) {
+	float ret = Transform::dot(vec1 - vec2, vec1 - vec2);
+	return ret;
+}
 Transform::Transform()
 {
 

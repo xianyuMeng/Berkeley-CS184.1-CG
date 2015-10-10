@@ -1,10 +1,10 @@
-#ifndef _INCLUDETRIANGLEHEADER
-#define _INCLUDETRIANGLEHEADER
-#include "Primative.h"
-class triangle : public primative{
+#ifndef _INCLUDETriangleHEADER
+#define _INCLUDETriangleHEADER
+#include "Primitive.h"
+class Triangle : public Primitive{
 public:
-	triangle(const vec3 &A, const vec3 &B, const vec3 &C, const object &obj);
-	virtual ~triangle(){};
+	Triangle(const vec3 &A, const vec3 &B, const vec3 &C, const object &obj);
+	virtual ~Triangle(){};
 
 	virtual intersectP intersection(const Ray &ray) const;
 private:

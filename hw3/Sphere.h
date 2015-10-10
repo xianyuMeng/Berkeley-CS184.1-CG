@@ -1,17 +1,17 @@
-#ifndef _INCLUDESPHEREHEADER
-#define _INCLUDESPHEREHEADER
+#ifndef _INCLUDESphereHEADER
+#define _INCLUDESphereHEADER
 
-#include "Primative.h"
+#include "Primitive.h"
 
 
 //using namespace glm;
 
-class sphere : public primative{
+class Sphere : public Primitive{
 public:
-	//A sphere is defined by its center and radius
-	sphere(const vec3 &center, const float radius, const mat4 &transformobj, const object &obj);
+	//A Sphere is defined by its center and radius
+	Sphere(const vec3 &center, const float radius, const mat4 &transformobj, const object &obj);
 
-	virtual ~sphere(){};
+	virtual ~Sphere(){};
 	/*Ray - Scene Intersection
 	1. Apply inverse transform M^(-1) to ray
 		ray directions have homogeneous crood set to 0
