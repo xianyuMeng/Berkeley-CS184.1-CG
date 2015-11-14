@@ -1,6 +1,7 @@
 #include "RayTracer.h"
 #include <fstream>
 #include <iomanip>
+#include<thread>
 
 using namespace std;
 bool RayTracer::readvals(stringstream &s, const int numvals, float* values)
@@ -30,10 +31,12 @@ void RayTracer::trace(Ray &ray, int depth, vec3 *color) {
 		return;
 	}
 	intersectP hitPoint;
+	int whatever = -1;
 	hitPoint.tHit = FarFarAway;
 	for (size_t i = 0; i < Primitive.size(); ++i) {
 		intersectP hit = Primitive[i]->intersection(ray);
 		if (hit.tHit > NEAR && hit.tHit < hitPoint.tHit){
+			whatever = i;
 			hitPoint = hit;		
 		}
 	}
@@ -144,11 +147,11 @@ RayTracer::RayTracer(const char *filename) {
 				else if (cmd == "tri"){
 					validinput = readvals(s, 3, values);
 					if (validinput){
-						vec4 A = vec4(vertex[values[0]], 1);
+						vec4 A = vec4(vertex[(unsigned int)values[0]], 1);
 						A = transformMat.top() * A;
-						vec4 B = vec4(vertex[values[1]], 1);
+						vec4 B = vec4(vertex[(unsigned int)values[1]], 1);
 						B = transformMat.top() * B;
-						vec4 C = vec4(vertex[values[2]], 1);
+						vec4 C = vec4(vertex[(unsigned int )values[2]], 1);
 						C = transformMat.top() * C;
 						Triangle *tri = new Triangle(vec3(A.x/A.w, A.y/A.w, A.z/A.w),
 							vec3(B.x / B.w, B.y / B.w, B.z / B.w), vec3(C.x / C.w, C.y / C.w, C.z / C.w) , obj);
@@ -253,9 +256,7 @@ RayTracer::RayTracer(const char *filename) {
 
 				else {
 
-				}
-
-				
+				}	
 			}
 			getline(in, str);
 		}
@@ -268,25 +269,67 @@ RayTracer::~RayTracer() {
 		delete Primitive[i];
 	}
 }
-void RayTracer::recursive(){
-	film = new Film(width, height);
-	for (int i = 0; i < width; ++i) {
-		for (int j = 0; j < height; ++j) {
-			if (i == 120 && j == 9) {
-				int x = 2;
+static const int thread_num = 1;
+void RayTracer::call_from_thread(int tid, int *total){
+	for (int i = width / thread_num * (tid); i < width / thread_num * (tid + 1); ++i){
+		for (int j = 0; j < height; ++j){
+			//float percent = float(i * height + j) / float(width * height);
+			//std::cout << "\r";
+			//std::cout << "Well: " << fixed << setprecision(2) << percent * 100.0f << "%";
+			if (i == 455 - 1 && j == height - 338){
+				int x = 1;
+				x++;
 			}
-			if (i == width / 2 && j == height / 2) {
-				int x = 1 + 1;
-			}
-			float percent = float(i * height + j) / float(width * height);
-			std::cout << "\r";
-			std::cout << "Well: " << fixed << setprecision(2) << percent * 100.0f << "%";
 			Ray ray = camera->GenerateRay(i, j);
 			vec3 color(0.0, 0.0, 0.0);
 			trace(ray, depth, &color);
 			film->commit(color, i, j);
+			(*total)++;
 		}
 	}
+}
+
+void RayTracer::recursive(){
+	film = new Film(width, height);
+	std::thread t[thread_num];
+	int progress[thread_num];
+	for (int i = 0; i < thread_num; ++i){
+		progress[i] = 0;
+		t[i] = std::thread(&RayTracer::call_from_thread, this, i, &progress[i]);
+	}
+
+	for (;;) {
+		int total = 0;
+		for (const auto i : progress){
+			total += i;
+		}
+		float percent = float(total) / float(width * height);
+		std::cout << "\r";
+		std::cout << "Well: " << fixed << setprecision(2) << percent * 100.0f << "%";
+		if (total == width * height)
+			break;
+	}
+
+	for (int i = 0; i < thread_num; ++i){
+		t[i].join();
+	}
+	//for (int i = 0; i < width; ++i) {
+	//	for (int j = 0; j < height; ++j) {
+	//		if (i == 60 && j == 60) {
+	//			int x = 2;
+	//		}
+	//		/*if (i == width / 2 && j == height / 2) {
+	//			int x = 1 + 1;
+	//		}*/
+	//		float percent = float(i * height + j) / float(width * height);
+	//		std::cout << "\r";
+	//		std::cout << "Well: " << fixed << setprecision(2) << percent * 100.0f << "%";
+	//		Ray ray = camera->GenerateRay(i, j);
+	//		vec3 color(0.0, 0.0, 0.0);
+	//		trace(ray, depth, &color);
+	//		film->commit(color, i, j);
+	//	}
+	//}
 	film->WriteImage(filename);
 	delete film;
 }

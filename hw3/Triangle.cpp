@@ -27,7 +27,7 @@ intersectP Triangle::intersection(const Ray &ray) const {
 	float f = 1.0f / a;
 	vec3 s = ray.pos - A;
 	float u = f * (Transform::dot(s, p));
-	if (u <= 0.0f || u >= 1.0f)
+	if (u < 0.0f || u > 1.0f)
 		return ret;
 	vec3 q = cross(s, vec1);
 	float v = f * Transform::dot(ray.direction, q);

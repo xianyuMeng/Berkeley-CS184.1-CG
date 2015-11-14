@@ -23,19 +23,27 @@ intersectP Sphere::intersection(const Ray &ray)const{
 	3. transform intersection back to actual coords
 	intersection point p transform as Mp
 	Normals n transform as M^(-1)n*/
-	vec4 InvDirection = inversetransform * vec4(ray.direction, 0);
-	vec4 InvPos = inversetransform * vec4(ray.pos, 0);
+	/*
+	ray-sphere intersection Geometry
+	see http://www.vis.uky.edu/~ryang/teaching/cs535-2012spr/Lectures/13-RayTracing-II.pdf
+	for futher information
+	*/
+	//vec4 InvDirection = inversetransform * vec4(ray.direction, 0);
+	//vec4 InvPos = inversetransform * vec4(ray.pos, 1);
+	
+	vec3 InvPos = vec4_to_vec3(inversetransform * vec4(ray.pos, 1));
+	vec3 InvDirection = normalize(applyMatrix(inversetransform, ray.pos + ray.direction) - InvPos);
 	InvDirection = normalize(InvDirection);
 	intersectP ret;
 	ret.obj = obj;
 	ret.tHit = FarFarAway;
-	vec4 OC = vec4(center, 0) - InvPos;
+	vec3 OC = center - InvPos;
 	bool inside = false;
-	float OC_square = Transform::distance(vec4_to_vec3(OC), vec4_to_vec3(OC));
+	float OC_square = Transform::dot(OC, OC);
 	if (OC_square < radius)
 		inside = true;
 	//distance from ray_origin to the point closet to sphere_center
-	float t_ca = Transform::dot(vec4_to_vec3(InvDirection), vec4_to_vec3(OC));
+	float t_ca = Transform::dot(InvDirection, OC);
 	if (t_ca < NEAR && inside == false){
 		//the ray does not intersect the sphere
 		return ret;
@@ -51,10 +59,11 @@ intersectP Sphere::intersection(const Ray &ray)const{
 			if (inside == false){
 				//ray_origin is outside the sphere
 				float t = t_ca - t_hc;
-				vec4 HitPoint = InvPos + t * InvDirection;
-				ret.intersectPoint = vec4_to_vec3(transformobj * HitPoint);
-				ret.tHit = Transform::distance(ret.intersectPoint, ray.pos);
-				ret.normal = vec4_to_vec3(inversetransform * vec4(vec4_to_vec3(HitPoint) - center, 0));
+				vec3 HitPoint = InvPos + t * InvDirection;
+				vec3 normal = HitPoint - center;
+				ret.intersectPoint = applyMatrix(transformobj, HitPoint);
+				ret.tHit = length(ret.intersectPoint - ray.pos);
+				ret.normal = inverseTranspose(mat3(transformobj)) * normal;
 				ret.normal = normalize(ret.normal);
 				return ret;
 			}
@@ -62,32 +71,33 @@ intersectP Sphere::intersection(const Ray &ray)const{
 				//ray_origin is inside the sphere
 				//inside == true
 				float t = t_ca + t_hc;
-				vec4 HitPoint = InvPos + t * InvDirection;
-				ret.intersectPoint = vec4_to_vec3(transformobj * HitPoint);
-				ret.tHit = Transform::distance(ret.intersectPoint, ray.pos);
-				ret.normal = vec4_to_vec3(inversetransform * vec4(vec4_to_vec3(HitPoint) - center, 0));
+				vec3 HitPoint = InvPos + t * InvDirection;
+				vec3 normal = HitPoint - center;
+				ret.intersectPoint = applyMatrix(transformobj, HitPoint);
+				ret.tHit = length(ret.intersectPoint - ray.pos);
+				ret.normal = inverseTranspose(mat3(transformobj)) * normal;
 				ret.normal = normalize(ret.normal);
 				return ret;
 			}
 		}
 	}
 
-
+	
 	//vec4 InvDirection = inversetransform * vec4(ray.direction, 0);
 	//vec4 InvPos = inversetransform * vec4(ray.pos, 1);
 	//InvDirection = normalize(InvDirection);
 	//intersectP ret;
 	//ret.obj = obj;
 	//ret.tHit = FarFarAway;
-	//vec3 PosCen = vec3(InvPos.x - center.x, InvPos.y - center.y, InvPos.z - center.z);
+	//vec3 poscen = vec4_to_vec3(InvPos) - center;
 	////solve quadratic equation for t.
-	//double A = Transform::dot(vec3(InvDirection.x, InvDirection.y, InvDirection.z), vec3(InvDirection.x, InvDirection.y, InvDirection.z));
-	//double B = 2 * Transform::dot(vec3(InvDirection.x, InvDirection.y, InvDirection.z), PosCen);
-	//double C = Transform::dot(PosCen, PosCen) - radius * radius;
-	//double delta = B * B - 4 * A * C;
+	//double a = Transform::dot(vec4_to_vec3(InvDirection), vec4_to_vec3(InvDirection));
+	//double b = 2 * Transform::dot(vec4_to_vec3(InvDirection), poscen);
+	//double c = Transform::dot(poscen, poscen) - radius * radius;
+	//double delta = b * b - 4 * a * c;
 	//
 	//if (abs(delta) <= NEAR){
-	//	double t = -B / (2 * A);
+	//	float t = -b / (2 * a);
 	//	vec4 HitP = InvPos + t * InvDirection;
 	//	ret.intersectPoint = vec4_to_vec3(transformobj * HitP);
 	//	ret.tHit = distance(ret.intersectPoint, ray.pos);
@@ -100,30 +110,38 @@ intersectP Sphere::intersection(const Ray &ray)const{
 	//	return ret;
 	//}
 	//else{
-	//	if (abs(Transform::dot(PosCen, PosCen)) <= radius){
+	//	if (abs(Transform::dot(poscen, poscen)) <= radius){
 	//		//ray origin inside the Sphere: one positive root and one negetive root.
-	//		double t = (-B + sqrt(delta)) / (2 * A);
+	//		float t = (-b + sqrt(delta)) / (2 * a);
+	//		/*if (t < NEAR)
+	//			return ret;
+	//		else {*/
 	//		vec4 HitP = InvPos + t * InvDirection;
-	//		vec4 HittoCen = vec4(vec4_to_vec3(HitP) - center, 0);
-	//		ret.normal = normalize(vec4_to_vec3(inversetransform * HittoCen));
-	//		ret.intersectPoint = vec4_to_vec3(transformobj * (HitP));
+	//		ret.intersectPoint = vec4_to_vec3(transformobj * HitP);
 	//		ret.tHit = distance(ret.intersectPoint, ray.pos);
+	//		ret.normal = normalize(vec4_to_vec3(inversetransform * vec4(vec4_to_vec3(HitP) - center, 0)));
 	//		return ret;
+	//		//}
 	//	}
 	//	else{
 	//		//two real positive roots:pick smaller one.
-	//		double t = (-B - sqrt(delta)) / (2 * A);
+	//		float t = (-b - sqrt(delta)) / (2 * a);
+	//		/*if (t < NEAR){
+	//			return ret;
+	//		}
+	//		else {*/
 	//		vec4 HitP = InvPos + t * InvDirection;
-	//		vec4 HittoCen = vec4(vec4_to_vec3(HitP) - center, 0);
-	//		ret.normal = normalize(vec4_to_vec3(inversetransform * HittoCen));
 	//		ret.intersectPoint = vec4_to_vec3(transformobj * HitP);
 	//		ret.tHit = distance(ret.intersectPoint, ray.pos);
+	//		ret.normal = normalize(vec4_to_vec3(inversetransform * vec4(vec4_to_vec3(HitP) - center, 0)));
 	//		return ret;
+	//		/*}*/
+	//			
 	//	}
 	//}
 
-
-	/*mat3 normal_mat = inverseTranspose(mat3(transformobj));
+/*
+	mat3 normal_mat = inverseTranspose(mat3(transformobj));
 
 	vec3 o = applyMatrix(inversetransform, ray.pos);
 	vec3 d = normalize(applyMatrix(inversetransform, ray.pos + ray.direction) - o);
@@ -180,5 +198,6 @@ intersectP Sphere::intersection(const Ray &ray)const{
 			ret.normal = normalize(normal_mat * normal);
 		}
 		return ret;
-	}*/
+	}
+	*/
 }

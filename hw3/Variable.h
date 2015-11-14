@@ -4,7 +4,7 @@
 #include "glm\glm.hpp"
 using namespace glm;
 #define FarFarAway 10000.0f
-#define NEAR 0.00001f
+#define NEAR 0.0001f
 
 struct object{
 	vec3 diffuse;

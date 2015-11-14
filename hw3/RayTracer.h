@@ -22,6 +22,7 @@ public:
 	void recursive();
 	bool readvals(std::stringstream &s, const int numvals, float *values);
 	void rightmultiply(const mat4 & M, std::stack<mat4> &transfstack);
+	void call_from_thread(int tid, int *total);
 private:
 	int depth;
 	int width, height;
